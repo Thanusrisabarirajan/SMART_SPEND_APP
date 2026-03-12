@@ -12,9 +12,50 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
 
   final TextEditingController budgetController = TextEditingController();
 
+  void goToCategoryScreen() {
+
+    String budgetText = budgetController.text.trim();
+
+    if (budgetText.isEmpty) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter your budget"),
+        ),
+      );
+
+      return;
+    }
+
+    int? budget = int.tryParse(budgetText);
+
+    if (budget == null || budget <= 0) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Enter a valid budget amount"),
+        ),
+      );
+
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CategoryScreen(
+          totalBudget: budget,
+        ),
+      ),
+    );
+
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       backgroundColor: Colors.white,
 
       body: Center(
@@ -28,7 +69,7 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
               const Text(
                 "Enter Your Budget",
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -38,50 +79,38 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
               TextField(
                 controller: budgetController,
                 keyboardType: TextInputType.number,
+
                 decoration: InputDecoration(
                   hintText: "Enter amount (₹)",
+
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFD4A373),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 35),
 
               ElevatedButton(
-                onPressed: () {
 
-                  String budget = budgetController.text;
-
-                  if (budget.isNotEmpty) {
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CategoryScreen(
-                          totalBudget: int.parse(budget),
-                        ),
-                      ),
-                    );
-
-                  } else {
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please enter a budget amount"),
-                      ),
-                    );
-
-                  }
-
-                },
+                onPressed: goToCategoryScreen,
 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD4A373),
+
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 15,
+                    horizontal: 50,
+                    vertical: 16,
                   ),
+
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -96,7 +125,7 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
                   ),
                 ),
 
-              )
+              ),
 
             ],
           ),

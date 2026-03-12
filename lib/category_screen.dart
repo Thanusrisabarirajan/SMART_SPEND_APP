@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
-
   final int totalBudget;
 
   const CategoryScreen({super.key, required this.totalBudget});
@@ -12,20 +11,21 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen> {
 
-  final TextEditingController categoryController = TextEditingController();
-  final TextEditingController limitController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController limitController = TextEditingController();
 
-  List<Map<String, int>> categories = [];
+  List<Map<String, dynamic>> categories = [];
 
   int totalCategoryLimits = 0;
 
   void addCategory() {
 
-    if (categoryController.text.isEmpty || limitController.text.isEmpty) {
+    String categoryName = categoryController.text;
+    int newLimit = int.tryParse(limitController.text) ?? 0;
+
+    if (categoryName.isEmpty || newLimit == 0) {
       return;
     }
-
-    int newLimit = int.parse(limitController.text);
 
     if (totalCategoryLimits + newLimit > widget.totalBudget) {
 
@@ -39,19 +39,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
 
     setState(() {
-
       categories.add({
-        "name": categoryController.text,
+        "name": categoryName,
         "limit": newLimit,
       });
 
       totalCategoryLimits += newLimit;
-
-      categoryController.clear();
-      limitController.clear();
-
     });
 
+    categoryController.clear();
+    limitController.clear();
   }
 
   @override
@@ -70,22 +67,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         padding: const EdgeInsets.all(20),
 
         child: Column(
-
           children: [
-
-            Text(
-              "Total Budget: ₹${widget.totalBudget}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 10),
-
-            Text(
-              "Savings: ₹$savings",
-              style: const TextStyle(fontSize: 18, color: Colors.green),
-            ),
-
-            const SizedBox(height: 20),
 
             TextField(
               controller: categoryController,
@@ -97,7 +79,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
 
             TextField(
               controller: limitController,
@@ -110,14 +92,43 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
 
             ElevatedButton(
               onPressed: addCategory,
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4A373),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 35,
+                  vertical: 15,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
-              child: const Text("Add Category"),
+
+              child: const Text(
+                "Add Category",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Savings: ₹$savings",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
             ),
 
             const SizedBox(height: 20),
@@ -125,29 +136,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
             Expanded(
               child: ListView.builder(
                 itemCount: categories.length,
+
                 itemBuilder: (context, index) {
 
                   return Card(
                     child: ListTile(
-                      title: Text(categories[index]["name"].toString()),
+                      title: Text(categories[index]["name"]),
                       subtitle: Text(
                         "Limit: ₹${categories[index]["limit"]}",
                       ),
                     ),
                   );
-
                 },
               ),
-            )
+            ),
 
           ],
-
         ),
-
       ),
-
     );
-
   }
-
 }
