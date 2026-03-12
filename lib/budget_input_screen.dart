@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'category_screen.dart';
 
 class BudgetInputScreen extends StatefulWidget {
   const BudgetInputScreen({super.key});
@@ -14,7 +15,6 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: Colors.white,
 
       body: Center(
@@ -50,12 +50,28 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
               const SizedBox(height: 30),
 
               ElevatedButton(
-
                 onPressed: () {
 
                   String budget = budgetController.text;
 
-                  print("Budget Entered: ₹$budget");
+                  if (budget.isNotEmpty) {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CategoryScreen(),
+                      ),
+                    );
+
+                  } else {
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Please enter a budget amount"),
+                      ),
+                    );
+
+                  }
 
                 },
 
