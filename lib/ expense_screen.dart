@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ExpenseScreen extends StatefulWidget {
-  const ExpenseScreen({super.key});
+
+  final int totalBudget;
+  final int lastWeekSavings;
+
+  const ExpenseScreen({
+    super.key,
+    required this.totalBudget,
+    required this.lastWeekSavings,
+  });
 
   @override
   State<ExpenseScreen> createState() => _ExpenseScreenState();
@@ -9,36 +17,58 @@ class ExpenseScreen extends StatefulWidget {
 
 class _ExpenseScreenState extends State<ExpenseScreen> {
 
-  final TextEditingController amountController = TextEditingController();
+  TextEditingController expenseController = TextEditingController();
 
-  String selectedCategory = "Food";
+  int remainingBudget = 0;
+  int remainingLastWeek = 0;
 
-  List<String> categories = [
-    "Food",
-    "Transport",
-    "Snacks",
-    "Recharge",
-  ];
+  String message = "";
+  Color messageColor = Colors.black;
 
-  List<Map<String, String>> expenses = [];
+  @override
+  void initState() {
+    super.initState();
+    remainingBudget = widget.totalBudget;
+    remainingLastWeek = widget.lastWeekSavings;
+  }
 
   void addExpense() {
 
-    if (amountController.text.isNotEmpty) {
+    int expense = int.tryParse(expenseController.text) ?? 0;
+
+    if (expense <= remainingBudget) {
 
       setState(() {
+        remainingBudget -= expense;
+        message = "Expense added successfully";
+        messageColor = Colors.green;
+      });
 
-        expenses.add({
-          "amount": amountController.text,
-          "category": selectedCategory
+    } else {
+
+      int needed = expense - remainingBudget;
+
+      if (needed <= remainingLastWeek) {
+
+        setState(() {
+          remainingLastWeek -= needed;
+          remainingBudget = 0;
+          message = "Used ₹$needed from last week savings";
+          messageColor = Colors.orange;
         });
 
-        amountController.clear();
+      } else {
 
-      });
+        setState(() {
+          message = "Not sufficient amount";
+          messageColor = Colors.red;
+        });
+
+      }
 
     }
 
+    expenseController.clear();
   }
 
   @override
@@ -47,7 +77,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text("Add Expense"),
+        title: const Text("Expense Tracker"),
         backgroundColor: const Color(0xFFD4A373),
       ),
 
@@ -55,73 +85,74 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         padding: const EdgeInsets.all(20),
 
         child: Column(
+
           children: [
 
+            Text(
+              "Current Budget: ₹$remainingBudget",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            Text(
+              "Last Week Savings: ₹$remainingLastWeek",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
             TextField(
-              controller: amountController,
+              controller: expenseController,
               keyboardType: TextInputType.number,
+
               decoration: InputDecoration(
-                hintText: "Enter amount ₹",
+                hintText: "Enter expense amount",
+
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
 
-            const SizedBox(height: 15),
-
-            DropdownButton<String>(
-              value: selectedCategory,
-
-              items: categories.map((String category) {
-
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
-                );
-
-              }).toList(),
-
-              onChanged: (value) {
-
-                setState(() {
-                  selectedCategory = value!;
-                });
-
-              },
-            ),
-
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
             ElevatedButton(
+
               onPressed: addExpense,
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4A373),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
               ),
+
               child: const Text("Add Expense"),
+
             ),
 
             const SizedBox(height: 20),
 
-            Expanded(
-              child: ListView.builder(
-                itemCount: expenses.length,
-                itemBuilder: (context, index) {
-
-                  return ListTile(
-                    title: Text("₹${expenses[index]["amount"]}"),
-                    subtitle: Text(expenses[index]["category"]!),
-                  );
-
-                },
+            Text(
+              message,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: messageColor,
               ),
-            )
+            ),
 
           ],
         ),
       ),
-
     );
-
   }
 }
