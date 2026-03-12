@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
-  const CategoryScreen({super.key});
+
+  final int totalBudget;
+
+  const CategoryScreen({super.key, required this.totalBudget});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -12,24 +15,50 @@ class _CategoryScreenState extends State<CategoryScreen> {
   final TextEditingController categoryController = TextEditingController();
   final TextEditingController limitController = TextEditingController();
 
-  List<Map<String, String>> categories = [];
+  List<Map<String, int>> categories = [];
+
+  int totalCategoryLimits = 0;
 
   void addCategory() {
-    if (categoryController.text.isNotEmpty && limitController.text.isNotEmpty) {
-      setState(() {
-        categories.add({
-          "name": categoryController.text,
-          "limit": limitController.text,
-        });
 
-        categoryController.clear();
-        limitController.clear();
-      });
+    if (categoryController.text.isEmpty || limitController.text.isEmpty) {
+      return;
     }
+
+    int newLimit = int.parse(limitController.text);
+
+    if (totalCategoryLimits + newLimit > widget.totalBudget) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Category limits exceed total budget"),
+        ),
+      );
+
+      return;
+    }
+
+    setState(() {
+
+      categories.add({
+        "name": categoryController.text,
+        "limit": newLimit,
+      });
+
+      totalCategoryLimits += newLimit;
+
+      categoryController.clear();
+      limitController.clear();
+
+    });
+
   }
 
   @override
   Widget build(BuildContext context) {
+
+    int savings = widget.totalBudget - totalCategoryLimits;
+
     return Scaffold(
 
       appBar: AppBar(
@@ -41,7 +70,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
         padding: const EdgeInsets.all(20),
 
         child: Column(
+
           children: [
+
+            Text(
+              "Total Budget: ₹${widget.totalBudget}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 10),
+
+            Text(
+              "Savings: ₹$savings",
+              style: const TextStyle(fontSize: 18, color: Colors.green),
+            ),
+
+            const SizedBox(height: 20),
 
             TextField(
               controller: categoryController,
@@ -66,7 +110,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
 
             ElevatedButton(
               onPressed: addCategory,
@@ -85,8 +129,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
                   return Card(
                     child: ListTile(
-                      title: Text(categories[index]["name"]!),
-                      subtitle: Text("Limit: ₹${categories[index]["limit"]}"),
+                      title: Text(categories[index]["name"].toString()),
+                      subtitle: Text(
+                        "Limit: ₹${categories[index]["limit"]}",
+                      ),
                     ),
                   );
 
@@ -95,8 +141,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
             )
 
           ],
+
         ),
+
       ),
+
     );
+
   }
+
 }

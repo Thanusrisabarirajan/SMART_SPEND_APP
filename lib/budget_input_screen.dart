@@ -10,7 +10,7 @@ class BudgetInputScreen extends StatefulWidget {
 
 class _BudgetInputScreenState extends State<BudgetInputScreen> {
 
-  TextEditingController budgetController = TextEditingController();
+  final TextEditingController budgetController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,6 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
               TextField(
                 controller: budgetController,
                 keyboardType: TextInputType.number,
-
                 decoration: InputDecoration(
                   hintText: "Enter amount (₹)",
                   border: OutlineInputBorder(
@@ -59,7 +58,9 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CategoryScreen(),
+                        builder: (context) => CategoryScreen(
+                          totalBudget: int.parse(budget),
+                        ),
                       ),
                     );
 
@@ -77,12 +78,10 @@ class _BudgetInputScreenState extends State<BudgetInputScreen> {
 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD4A373),
-
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,
                     vertical: 15,
                   ),
-
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
