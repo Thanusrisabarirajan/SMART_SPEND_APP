@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'period_selection_screen.dart';
 
 void main() {
   runApp(SmartSpendApp());
@@ -66,7 +67,14 @@ class WelcomeScreen extends StatelessWidget {
             SizedBox(height: 40),
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PeriodSelectionScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD4A373),
                 padding: EdgeInsets.symmetric(
