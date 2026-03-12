@@ -1,16 +1,34 @@
-# smart_spend_app
+# SMART SPEND APP
 
-A new Flutter project.
+A Smart Budgeting Flutter Application.
+
+## About the Project
+
+Smart Spend is a Flutter-based budgeting application designed to help users track expenses, manage spending, and improve financial awareness.
+
+The goal of this project is to create a simple and user-friendly expense tracking app that helps users:
+
+• Track daily expenses  
+• Monitor spending habits  
+• Improve budgeting discipline  
+
+## Features
+
+- Expense Tracking
+- Budget Monitoring
+- Simple and Clean UI
+- Smart Spend Welcome Screen
+- Cross Platform (Web / Android / iOS)
+
+## Built With
+
+- Flutter
+- Dart
+- Visual Studio Code
+- GitHub
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To run this project locally:
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the repository
