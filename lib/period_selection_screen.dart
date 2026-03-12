@@ -7,6 +7,7 @@ class PeriodSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -17,40 +18,67 @@ class PeriodSelectionScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
 
             const SizedBox(height: 50),
 
+            // Weekly Button
             ElevatedButton(
               onPressed: () {
                 print("Weekly Selected");
               },
+
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: const Color(0xFFA8E6CF), // pastel green
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 40, vertical: 15),
+                  horizontal: 45,
+                  vertical: 18,
+                ),
+
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
+
               child: const Text(
                 "Weekly Budget",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
+            // Monthly Button
             ElevatedButton(
               onPressed: () {
                 print("Monthly Selected");
               },
+
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: const Color(0xFFFFC1CC), // pastel pink
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 40, vertical: 15),
+                  horizontal: 40,
+                  vertical: 18,
+                ),
+
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
+
               child: const Text(
                 "Monthly Budget",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
             ),
 
