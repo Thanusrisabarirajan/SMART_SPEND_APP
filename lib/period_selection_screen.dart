@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'budget_input_screen.dart';
 
 class PeriodSelectionScreen extends StatelessWidget {
   const PeriodSelectionScreen({super.key});
@@ -27,7 +28,12 @@ class PeriodSelectionScreen extends StatelessWidget {
             // Weekly Button
             ElevatedButton(
               onPressed: () {
-                print("Weekly Selected");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BudgetInputScreen(),
+                  ),
+                );
               },
 
               style: ElevatedButton.styleFrom(
@@ -36,7 +42,6 @@ class PeriodSelectionScreen extends StatelessWidget {
                   horizontal: 45,
                   vertical: 18,
                 ),
-
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -57,7 +62,12 @@ class PeriodSelectionScreen extends StatelessWidget {
             // Monthly Button
             ElevatedButton(
               onPressed: () {
-                print("Monthly Selected");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BudgetInputScreen(),
+                  ),
+                );
               },
 
               style: ElevatedButton.styleFrom(
@@ -66,7 +76,6 @@ class PeriodSelectionScreen extends StatelessWidget {
                   horizontal: 40,
                   vertical: 18,
                 ),
-
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
