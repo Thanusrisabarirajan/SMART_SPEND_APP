@@ -10,14 +10,20 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
 
   final TextEditingController categoryController = TextEditingController();
+  final TextEditingController limitController = TextEditingController();
 
-  List<String> categories = [];
+  List<Map<String, String>> categories = [];
 
   void addCategory() {
-    if (categoryController.text.isNotEmpty) {
+    if (categoryController.text.isNotEmpty && limitController.text.isNotEmpty) {
       setState(() {
-        categories.add(categoryController.text);
+        categories.add({
+          "name": categoryController.text,
+          "limit": limitController.text,
+        });
+
         categoryController.clear();
+        limitController.clear();
       });
     }
   }
@@ -40,7 +46,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
             TextField(
               controller: categoryController,
               decoration: InputDecoration(
-                hintText: "Enter category name",
+                hintText: "Category name (Food, Transport...)",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            TextField(
+              controller: limitController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: "Spending limit ₹",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -63,11 +82,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
               child: ListView.builder(
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
+
                   return Card(
                     child: ListTile(
-                      title: Text(categories[index]),
+                      title: Text(categories[index]["name"]!),
+                      subtitle: Text("Limit: ₹${categories[index]["limit"]}"),
                     ),
                   );
+
                 },
               ),
             )
