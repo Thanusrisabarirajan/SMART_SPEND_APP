@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'expense_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   final int totalBudget;
@@ -11,8 +12,8 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen> {
 
-  TextEditingController categoryController = TextEditingController();
-  TextEditingController limitController = TextEditingController();
+  final TextEditingController categoryController = TextEditingController();
+  final TextEditingController limitController = TextEditingController();
 
   List<Map<String, dynamic>> categories = [];
 
@@ -20,10 +21,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   void addCategory() {
 
-    String categoryName = categoryController.text;
+    String categoryName = categoryController.text.trim();
     int newLimit = int.tryParse(limitController.text) ?? 0;
 
-    if (categoryName.isEmpty || newLimit == 0) {
+    if (categoryName.isEmpty || newLimit <= 0) {
       return;
     }
 
@@ -39,16 +40,25 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
 
     setState(() {
+
       categories.add({
         "name": categoryName,
         "limit": newLimit,
       });
 
       totalCategoryLimits += newLimit;
+
     });
 
     categoryController.clear();
     limitController.clear();
+  }
+
+  @override
+  void dispose() {
+    categoryController.dispose();
+    limitController.dispose();
+    super.dispose();
   }
 
   @override
@@ -95,6 +105,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             const SizedBox(height: 15),
 
             ElevatedButton(
+
               onPressed: addCategory,
 
               style: ElevatedButton.styleFrom(
@@ -135,19 +146,67 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
             Expanded(
               child: ListView.builder(
+
                 itemCount: categories.length,
 
                 itemBuilder: (context, index) {
 
                   return Card(
+                    elevation: 2,
+                    margin: const EdgeInsets.only(bottom: 10),
+
                     child: ListTile(
-                      title: Text(categories[index]["name"]),
+                      title: Text(
+                        categories[index]["name"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
                       subtitle: Text(
                         "Limit: ₹${categories[index]["limit"]}",
                       ),
                     ),
                   );
                 },
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+
+              onPressed: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ExpenseScreen(
+                      totalBudget: widget.totalBudget,
+                      lastWeekSavings: savings,
+                    ),
+                  ),
+                );
+
+              },
+
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD4A373),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+
+              child: const Text(
+                "Continue to Expense Tracker",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
 
