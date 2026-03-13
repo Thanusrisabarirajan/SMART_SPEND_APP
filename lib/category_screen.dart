@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'expense_screen.dart';
+import 'package:smart_spend_app/expense_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   final int totalBudget;
 
-  const CategoryScreen({super.key, required this.totalBudget});
+  const CategoryScreen({
+    super.key,
+    required this.totalBudget,
+  });
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -73,144 +76,151 @@ class _CategoryScreenState extends State<CategoryScreen> {
         backgroundColor: const Color(0xFFD4A373),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      body: SafeArea(
 
-        child: Column(
-          children: [
+        child: Padding(
+          padding: const EdgeInsets.all(20),
 
-            TextField(
-              controller: categoryController,
-              decoration: InputDecoration(
-                hintText: "Category name (Food, Transport...)",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
+          child: Column(
 
-            const SizedBox(height: 15),
+            children: [
 
-            TextField(
-              controller: limitController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: "Spending limit ₹",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            ElevatedButton(
-
-              onPressed: addCategory,
-
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4A373),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 35,
-                  vertical: 15,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+              TextField(
+                controller: categoryController,
+                decoration: InputDecoration(
+                  hintText: "Category name (Food, Transport...)",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
 
-              child: const Text(
-                "Add Category",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 15),
+
+              TextField(
+                controller: limitController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Spending limit ₹",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 25),
+              const SizedBox(height: 15),
 
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Savings: ₹$savings",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+              ElevatedButton(
+
+                onPressed: addCategory,
+
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFD4A373),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 35,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+
+                child: const Text(
+                  "Add Category",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
-            Expanded(
-              child: ListView.builder(
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Savings: ₹$savings",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+              ),
 
-                itemCount: categories.length,
+              const SizedBox(height: 20),
 
-                itemBuilder: (context, index) {
+              Expanded(
+                child: ListView.builder(
 
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.only(bottom: 10),
+                  itemCount: categories.length,
 
-                    child: ListTile(
-                      title: Text(
-                        categories[index]["name"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                  itemBuilder: (context, index) {
+
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.only(bottom: 10),
+
+                      child: ListTile(
+
+                        title: Text(
+                          categories[index]["name"],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
 
-                      subtitle: Text(
-                        "Limit: ₹${categories[index]["limit"]}",
+                        subtitle: Text(
+                          "Limit: ₹${categories[index]["limit"]}",
+                        ),
+
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              ElevatedButton(
+
+                onPressed: () {
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ExpenseScreen(
+                        totalBudget: widget.totalBudget,
+                        lastWeekSavings: savings,
                       ),
                     ),
                   );
+
                 },
-              ),
-            ),
 
-            const SizedBox(height: 10),
-
-            ElevatedButton(
-
-              onPressed: () {
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ExpenseScreen(
-                      totalBudget: widget.totalBudget,
-                      lastWeekSavings: savings,
-                    ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFD4A373),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 16,
                   ),
-                );
-
-              },
-
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4A373),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 16,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+
+                child: const Text(
+                  "Continue to Expense Tracker",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+
               ),
 
-              child: const Text(
-                "Continue to Expense Tracker",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-          ],
+            ],
+          ),
         ),
       ),
     );
