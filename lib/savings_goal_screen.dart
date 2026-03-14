@@ -19,10 +19,18 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
 
     int remaining = savingsGoal - savedAmount;
 
+    if (remaining < 0) {
+      remaining = 0;
+    }
+
     double progress = 0;
 
     if (savingsGoal > 0) {
       progress = savedAmount / savingsGoal;
+
+      if (progress > 1) {
+        progress = 1;
+      }
     }
 
     return Scaffold(
@@ -58,6 +66,7 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
 
                 setState(() {
                   savingsGoal = int.tryParse(goalController.text) ?? 0;
+                  goalController.clear();
                 });
 
               },
@@ -93,9 +102,21 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
             LinearProgressIndicator(
               value: progress,
               minHeight: 10,
-              backgroundColor: Colors.grey[300],
+              backgroundColor: Colors.grey,
               color: Colors.green,
             ),
+
+            const SizedBox(height: 20),
+
+            if (savedAmount >= savingsGoal && savingsGoal > 0)
+              const Text(
+                "🎉 Goal Achieved!",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
 
             const SizedBox(height: 30),
 
