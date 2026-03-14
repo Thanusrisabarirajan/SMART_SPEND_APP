@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'savings_goal_screen.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
@@ -11,7 +12,7 @@ class ExpenseScreen extends StatefulWidget {
 
 class _ExpenseScreenState extends State<ExpenseScreen> {
 
-  TextEditingController expenseController = TextEditingController();
+  final TextEditingController expenseController = TextEditingController();
 
   String? selectedCategory;
 
@@ -27,7 +28,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   void initState() {
     super.initState();
 
-    // calculate total budget from categories
+    // Calculate total budget from categories
     for (var cat in widget.categories) {
       totalBudget += cat["limit"] as int;
     }
@@ -68,7 +69,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
       });
 
-      // spending reminder logic
+      // Spending reminder
       if (totalSpent > totalBudget * 0.7) {
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -145,9 +146,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-
               onPressed: addExpense,
-
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4A373),
                 padding: const EdgeInsets.symmetric(
@@ -155,9 +154,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   vertical: 15,
                 ),
               ),
-
               child: const Text("Add Expense"),
-
             ),
 
             const SizedBox(height: 20),
@@ -169,6 +166,29 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 fontWeight: FontWeight.bold,
                 color: messageColor,
               ),
+            ),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SavingsGoalScreen(),
+                  ),
+                );
+
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
+              ),
+              child: const Text("Savings Goal"),
             ),
 
             const SizedBox(height: 30),
