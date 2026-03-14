@@ -20,6 +20,19 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   String message = "";
   Color messageColor = Colors.black;
 
+  int totalSpent = 0;
+  int totalBudget = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // calculate total budget from categories
+    for (var cat in widget.categories) {
+      totalBudget += cat["limit"] as int;
+    }
+  }
+
   void addExpense() {
 
     int expense = int.tryParse(expenseController.text) ?? 0;
@@ -43,6 +56,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
         widget.categories[index]["limit"] -= expense;
 
+        totalSpent += expense;
+
         expenseHistory.add({
           "category": selectedCategory,
           "amount": expense
@@ -52,6 +67,19 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         messageColor = Colors.green;
 
       });
+
+      // spending reminder logic
+      if (totalSpent > totalBudget * 0.7) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "⚠️ You are spending too fast. Try to control your expenses.",
+            ),
+          ),
+        );
+
+      }
 
     } else {
 
@@ -108,7 +136,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
               decoration: InputDecoration(
                 hintText: "Enter expense amount",
-
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
