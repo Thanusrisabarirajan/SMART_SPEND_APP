@@ -47,7 +47,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     }
 
     int index = widget.categories.indexWhere(
-        (cat) => cat["name"] == selectedCategory);
+      (cat) => cat["name"] == selectedCategory,
+    );
 
     int remaining = widget.categories[index]["limit"];
 
@@ -113,7 +114,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
-              value: selectedCategory,
+              initialValue: selectedCategory, // FIXED HERE
 
               items: widget.categories.map((cat) {
                 return DropdownMenuItem<String>(
@@ -134,7 +135,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             TextField(
               controller: expenseController,
               keyboardType: TextInputType.number,
-
               decoration: InputDecoration(
                 hintText: "Enter expense amount",
                 border: OutlineInputBorder(
@@ -176,7 +176,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SavingsGoalScreen(),
+                    builder: (context) => SavingsGoalScreen(
+                      totalBudget: totalBudget,
+                      totalSpent: totalSpent,
+                    ),
                   ),
                 );
 
@@ -207,34 +210,24 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             const SizedBox(height: 10),
 
             Expanded(
-
               child: ListView.builder(
-
                 itemCount: expenseHistory.length,
-
                 itemBuilder: (context, index) {
 
                   return Card(
-
                     child: ListTile(
-
                       title: Text(expenseHistory[index]["category"]),
-
                       trailing: Text(
                         "₹${expenseHistory[index]["amount"]}",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                     ),
-
                   );
 
                 },
-
               ),
-
             ),
 
           ],

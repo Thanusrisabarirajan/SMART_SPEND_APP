@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
 class SavingsGoalScreen extends StatefulWidget {
-  const SavingsGoalScreen({super.key});
+
+  final int totalBudget;
+  final int totalSpent;
+
+  const SavingsGoalScreen({
+    super.key,
+    required this.totalBudget,
+    required this.totalSpent,
+  });
 
   @override
   State<SavingsGoalScreen> createState() => _SavingsGoalScreenState();
@@ -12,10 +20,16 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
   final TextEditingController goalController = TextEditingController();
 
   int savingsGoal = 0;
-  int savedAmount = 0;
 
   @override
   Widget build(BuildContext context) {
+
+    // savings automatically calculated
+    int savedAmount = widget.totalBudget - widget.totalSpent;
+
+    if (savedAmount < 0) {
+      savedAmount = 0;
+    }
 
     int remaining = savingsGoal - savedAmount;
 
@@ -82,7 +96,7 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
             const SizedBox(height: 40),
 
             Text(
-              "Saved: ₹$savedAmount",
+              "Saved from Budget: ₹$savedAmount",
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -90,7 +104,7 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
             ),
 
             Text(
-              "Remaining: ₹$remaining",
+              "Remaining to Goal: ₹$remaining",
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -117,26 +131,6 @@ class _SavingsGoalScreenState extends State<SavingsGoalScreen> {
                   color: Colors.green,
                 ),
               ),
-
-            const SizedBox(height: 30),
-
-            ElevatedButton(
-
-              onPressed: () {
-
-                setState(() {
-                  savedAmount += 100; // demo increment
-                });
-
-              },
-
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-
-              child: const Text("Add ₹100 to Savings"),
-
-            ),
 
           ],
         ),
