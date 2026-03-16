@@ -34,6 +34,12 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    expenseController.dispose();
+    super.dispose();
+  }
+
   void addExpense() {
 
     int expense = int.tryParse(expenseController.text) ?? 0;
@@ -49,6 +55,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     int index = widget.categories.indexWhere(
       (cat) => cat["name"] == selectedCategory,
     );
+
+    if (index == -1) return;
 
     int remaining = widget.categories[index]["limit"];
 
@@ -114,7 +122,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
-              initialValue: selectedCategory, // FIXED HERE
+              initialValue: selectedCategory,
 
               items: widget.categories.map((cat) {
                 return DropdownMenuItem<String>(
