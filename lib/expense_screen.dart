@@ -22,14 +22,16 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   int totalSpent = 0;
   int totalBudget = 0;
+  int allocatedAmount = 0; // ✅ NEW
 
   @override
   void initState() {
     super.initState();
 
-    // ✅ ORIGINAL TOTAL BUDGET (VERY IMPORTANT)
+    // ✅ Calculate TOTAL + ALLOCATED
     for (var cat in widget.categories) {
       totalBudget += cat["limit"] as int;
+      allocatedAmount += cat["limit"] as int;
     }
   }
 
@@ -55,13 +57,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
       setState(() {
 
-        // reduce from category
         widget.categories[index]["limit"] -= expense;
 
-        // track total spent
         totalSpent += expense;
 
-        // history
         expenseHistory.add({
           "category": selectedCategory,
           "amount": expense
@@ -71,17 +70,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         messageColor = Colors.green;
 
       });
-
-      // ⚠️ Spending warning
-      if (totalSpent > totalBudget * 0.7) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "⚠️ You are spending too fast. Try to control your expenses.",
-            ),
-          ),
-        );
-      }
 
     } else {
 
@@ -98,8 +86,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
 
-    // ✅ FINAL SAVINGS LOGIC (THIS IS YOUR MAIN CHANGE)
-    int finalSavings = totalBudget - totalSpent;
+    // ✅ CORRECT LOGIC
+    int remainingBalance = totalBudget - allocatedAmount;
+    int finalSavings = remainingBalance - totalSpent;
 
     return Scaffold(
 
@@ -115,7 +104,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
           children: [
 
-            // CATEGORY SELECT
+            // CATEGORY
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
               value: selectedCategory,
@@ -136,7 +125,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // AMOUNT INPUT
+            // INPUT
             TextField(
               controller: expenseController,
               keyboardType: TextInputType.number,
@@ -150,15 +139,11 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // ADD EXPENSE BUTTON
+            // BUTTON
             ElevatedButton(
               onPressed: addExpense,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4A373),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 15,
-                ),
               ),
               child: const Text("Add Expense"),
             ),
@@ -169,27 +154,43 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             Text(
               message,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
                 color: messageColor,
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // ✅ FINAL SAVINGS DISPLAY (UPDATED)
-            Text(
-              "💰 Final Savings: ₹$finalSavings",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
+            // ✅ SHOW BOTH VALUES
+            Column(
+              children: [
+
+                Text(
+                  "Remaining Balance: ₹$remainingBalance",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  "💰 Final Savings: ₹$finalSavings",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+
+              ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
-            // FINISH WEEK BUTTON
+            // FINISH BUTTON
             ElevatedButton(
               onPressed: () {
                 showDialog(
@@ -208,38 +209,24 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               child: const Text("Finish Week"),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 "Expense History",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-
-            const SizedBox(height: 10),
 
             Expanded(
               child: ListView.builder(
                 itemCount: expenseHistory.length,
                 itemBuilder: (context, index) {
-
-                  return Card(
-                    child: ListTile(
-                      title: Text(expenseHistory[index]["category"]),
-                      trailing: Text(
-                        "₹${expenseHistory[index]["amount"]}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                  return ListTile(
+                    title: Text(expenseHistory[index]["category"]),
+                    trailing: Text("₹${expenseHistory[index]["amount"]}"),
                   );
-
                 },
               ),
             ),
