@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
+  final int weeklyBudget;
 
-  const ExpenseScreen({super.key, required this.categories});
+  const ExpenseScreen({
+    super.key,
+    required this.categories,
+    required this.weeklyBudget,
+  });
 
   @override
   State<ExpenseScreen> createState() => _ExpenseScreenState();
@@ -17,23 +22,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   List<Map<String, dynamic>> expenseHistory = [];
 
+  int totalSpent = 0;
+
   String message = "";
   Color messageColor = Colors.black;
-
-  int totalSpent = 0;
-  int totalBudget = 0;
-  int allocatedAmount = 0; // ✅ NEW
-
-  @override
-  void initState() {
-    super.initState();
-
-    // ✅ Calculate TOTAL + ALLOCATED
-    for (var cat in widget.categories) {
-      totalBudget += cat["limit"] as int;
-      allocatedAmount += cat["limit"] as int;
-    }
-  }
 
   void addExpense() {
 
@@ -86,10 +78,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
 
-    // ✅ CORRECT LOGIC
-    int remainingBalance = totalBudget - allocatedAmount;
-    int finalSavings = remainingBalance - totalSpent;
-
     return Scaffold(
 
       appBar: AppBar(
@@ -104,18 +92,15 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
           children: [
 
-            // CATEGORY
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
               value: selectedCategory,
-
               items: widget.categories.map((cat) {
                 return DropdownMenuItem<String>(
                   value: cat["name"],
                   child: Text("${cat["name"]} (₹${cat["limit"]})"),
                 );
               }).toList(),
-
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
@@ -125,7 +110,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // INPUT
             TextField(
               controller: expenseController,
               keyboardType: TextInputType.number,
@@ -139,7 +123,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // BUTTON
             ElevatedButton(
               onPressed: addExpense,
               style: ElevatedButton.styleFrom(
@@ -150,49 +133,18 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // MESSAGE
             Text(
               message,
-              style: TextStyle(
-                fontSize: 16,
-                color: messageColor,
-              ),
+              style: TextStyle(color: messageColor),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
-            // ✅ SHOW BOTH VALUES
-            Column(
-              children: [
-
-                Text(
-                  "Remaining Balance: ₹$remainingBalance",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  "💰 Final Savings: ₹$finalSavings",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
-
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // FINISH BUTTON
             ElevatedButton(
               onPressed: () {
+
+                int finalSavings = widget.weeklyBudget - totalSpent;
+
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
@@ -202,6 +154,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     ),
                   ),
                 );
+
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
