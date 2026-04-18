@@ -4,10 +4,7 @@ import 'expense_screen.dart';
 class CategoryScreen extends StatefulWidget {
   final int totalBudget;
 
-  const CategoryScreen({
-    super.key,
-    required this.totalBudget,
-  });
+  const CategoryScreen({super.key, required this.totalBudget});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -20,16 +17,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   final List<Map<String, dynamic>> categories = [];
 
-  int totalCategoryLimits = 0;
+  int totalAllocated = 0;
 
   void addCategory() {
+    String name = categoryController.text.trim();
+    int limit = int.tryParse(limitController.text) ?? 0;
 
-    final String categoryName = categoryController.text.trim();
-    final int newLimit = int.tryParse(limitController.text) ?? 0;
+    if (name.isEmpty || limit <= 0) return;
 
-    if (categoryName.isEmpty || newLimit <= 0) return;
-
-    if (totalCategoryLimits + newLimit > widget.totalBudget) {
+    if (totalAllocated + limit > widget.totalBudget) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Exceeds budget")),
       );
@@ -38,11 +34,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
     setState(() {
       categories.add({
-        "name": categoryName,
-        "limit": newLimit,
+        "name": name,
+        "limit": limit,
       });
 
-      totalCategoryLimits += newLimit;
+      totalAllocated += limit;
     });
 
     categoryController.clear();
@@ -52,7 +48,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
 
-    int remainingSavings = widget.totalBudget - totalCategoryLimits;
+    int saved = widget.totalBudget - totalAllocated;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Categories")),
@@ -63,12 +59,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
           children: [
 
-            TextField(controller: categoryController),
+            TextField(
+              controller: categoryController,
+              decoration: const InputDecoration(
+                hintText: "Category name",
+              ),
+            ),
+
             const SizedBox(height: 10),
 
             TextField(
               controller: limitController,
               keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                hintText: "Amount",
+              ),
             ),
 
             const SizedBox(height: 10),
@@ -81,9 +86,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
             const SizedBox(height: 20),
 
             Text(
-              "Saved from Allocation: ₹$remainingSavings",
+              "💰 Saved from Allocation: ₹$saved",
               style: const TextStyle(color: Colors.green),
             ),
+
+            const SizedBox(height: 20),
 
             Expanded(
               child: ListView.builder(
