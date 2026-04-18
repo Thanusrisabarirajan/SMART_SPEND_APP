@@ -21,31 +21,16 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   Color messageColor = Colors.black;
 
   int totalSpent = 0;
-  int totalBudget = 0;
+  int initialBudget = 0; // ✅ ORIGINAL TOTAL MONEY
 
   @override
   void initState() {
     super.initState();
 
-    // total initial budget (sum of category limits)
+    // ✅ Store ORIGINAL budget (before spending)
     for (var cat in widget.categories) {
-      totalBudget += cat["limit"] as int;
+      initialBudget += cat["limit"] as int;
     }
-  }
-
-  @override
-  void dispose() {
-    expenseController.dispose();
-    super.dispose();
-  }
-
-  // ✅ Calculate remaining (this is your savings)
-  int getTotalRemaining() {
-    int total = 0;
-    for (var cat in widget.categories) {
-      total += cat["limit"] as int;
-    }
-    return total;
   }
 
   void addExpense() {
@@ -63,8 +48,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     int index = widget.categories.indexWhere(
       (cat) => cat["name"] == selectedCategory,
     );
-
-    if (index == -1) return;
 
     int remaining = widget.categories[index]["limit"];
 
@@ -86,15 +69,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
       });
 
-      // Spending warning
-      if (totalSpent > totalBudget * 0.7) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("⚠️ You are spending too fast"),
-          ),
-        );
-      }
-
     } else {
 
       setState(() {
@@ -110,7 +84,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
 
-    int totalSavings = getTotalRemaining();
+    // ✅ FINAL SAVINGS LOGIC
+    int finalSavings = initialBudget - totalSpent;
 
     return Scaffold(
 
@@ -126,16 +101,17 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
           children: [
 
-            // CATEGORY DROPDOWN
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
               value: selectedCategory,
+
               items: widget.categories.map((cat) {
                 return DropdownMenuItem<String>(
                   value: cat["name"],
                   child: Text("${cat["name"]} (₹${cat["limit"]})"),
                 );
               }).toList(),
+
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
@@ -145,7 +121,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // AMOUNT INPUT
             TextField(
               controller: expenseController,
               keyboardType: TextInputType.number,
@@ -159,22 +134,24 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // ADD BUTTON
             ElevatedButton(
               onPressed: addExpense,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4A373),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
               ),
               child: const Text("Add Expense"),
             ),
 
             const SizedBox(height: 20),
 
-            // MESSAGE
             Text(
               message,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: messageColor,
               ),
@@ -182,9 +159,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // ✅ LIVE SAVINGS
+            // ✅ FINAL SAVINGS DISPLAY
             Text(
-              "💰 Current Savings: ₹$totalSavings",
+              "💰 Final Savings: ₹$finalSavings",
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -194,30 +171,33 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // ✅ FINISH WEEK BUTTON
             ElevatedButton(
               onPressed: () {
 
-                int finalSavings = getTotalRemaining();
-
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("Weekly Summary"),
-                    content: Text(
-                      "🎉 You saved ₹$finalSavings this week!",
-                    ),
-                  ),
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Weekly Summary"),
+                      content: Text(
+                        "🎉 You saved ₹$finalSavings this week!",
+                      ),
+                    );
+                  },
                 );
 
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
               ),
               child: const Text("Finish Week"),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             const Align(
               alignment: Alignment.centerLeft,
