@@ -21,15 +21,15 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   Color messageColor = Colors.black;
 
   int totalSpent = 0;
-  int initialBudget = 0; // ✅ ORIGINAL TOTAL MONEY
+  int totalBudget = 0;
 
   @override
   void initState() {
     super.initState();
 
-    // ✅ Store ORIGINAL budget (before spending)
+    // ✅ ORIGINAL TOTAL BUDGET (VERY IMPORTANT)
     for (var cat in widget.categories) {
-      initialBudget += cat["limit"] as int;
+      totalBudget += cat["limit"] as int;
     }
   }
 
@@ -55,10 +55,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
       setState(() {
 
+        // reduce from category
         widget.categories[index]["limit"] -= expense;
 
+        // track total spent
         totalSpent += expense;
 
+        // history
         expenseHistory.add({
           "category": selectedCategory,
           "amount": expense
@@ -68,6 +71,17 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         messageColor = Colors.green;
 
       });
+
+      // ⚠️ Spending warning
+      if (totalSpent > totalBudget * 0.7) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "⚠️ You are spending too fast. Try to control your expenses.",
+            ),
+          ),
+        );
+      }
 
     } else {
 
@@ -84,8 +98,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
 
-    // ✅ FINAL SAVINGS LOGIC
-    int finalSavings = initialBudget - totalSpent;
+    // ✅ FINAL SAVINGS LOGIC (THIS IS YOUR MAIN CHANGE)
+    int finalSavings = totalBudget - totalSpent;
 
     return Scaffold(
 
@@ -101,6 +115,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
           children: [
 
+            // CATEGORY SELECT
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
               value: selectedCategory,
@@ -121,6 +136,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
+            // AMOUNT INPUT
             TextField(
               controller: expenseController,
               keyboardType: TextInputType.number,
@@ -134,6 +150,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
+            // ADD EXPENSE BUTTON
             ElevatedButton(
               onPressed: addExpense,
               style: ElevatedButton.styleFrom(
@@ -148,6 +165,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
+            // MESSAGE
             Text(
               message,
               style: TextStyle(
@@ -159,40 +177,33 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // ✅ FINAL SAVINGS DISPLAY
+            // ✅ FINAL SAVINGS DISPLAY (UPDATED)
             Text(
               "💰 Final Savings: ₹$finalSavings",
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.green,
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
+            // FINISH WEEK BUTTON
             ElevatedButton(
               onPressed: () {
-
                 showDialog(
                   context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text("Weekly Summary"),
-                      content: Text(
-                        "🎉 You saved ₹$finalSavings this week!",
-                      ),
-                    );
-                  },
+                  builder: (context) => AlertDialog(
+                    title: const Text("Weekly Summary"),
+                    content: Text(
+                      "🎉 You saved ₹$finalSavings this week!",
+                    ),
+                  ),
                 );
-
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 15,
-                ),
               ),
               child: const Text("Finish Week"),
             ),
