@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
-  final int weeklyBudget;
+  final int weeklyBudget; // coming from previous screen
 
   const ExpenseScreen({
     super.key,
@@ -22,10 +22,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   List<Map<String, dynamic>> expenseHistory = [];
 
-  int totalSpent = 0;
-
   String message = "";
   Color messageColor = Colors.black;
+
+  int totalSpent = 0;
 
   void addExpense() {
 
@@ -40,8 +40,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     }
 
     int index = widget.categories.indexWhere(
-      (cat) => cat["name"] == selectedCategory,
-    );
+        (cat) => cat["name"] == selectedCategory);
 
     int remaining = widget.categories[index]["limit"];
 
@@ -78,6 +77,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
 
+    int remainingBalance = widget.weeklyBudget - totalSpent;
+    int finalSavings = widget.weeklyBudget - totalSpent;
+
     return Scaffold(
 
       appBar: AppBar(
@@ -95,12 +97,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             DropdownButtonFormField<String>(
               hint: const Text("Select Category"),
               value: selectedCategory,
+
               items: widget.categories.map((cat) {
                 return DropdownMenuItem<String>(
                   value: cat["name"],
                   child: Text("${cat["name"]} (₹${cat["limit"]})"),
                 );
               }).toList(),
+
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
@@ -138,16 +142,38 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               style: TextStyle(color: messageColor),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
+
+            // 🔵 Remaining balance (live)
+            Text(
+              "Remaining Balance: ₹$remainingBalance",
+              style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // 🟢 Final savings (live)
+            Text(
+              "💰 Final Savings: ₹$finalSavings",
+              style: const TextStyle(
+                color: Colors.green,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             ElevatedButton(
               onPressed: () {
 
-                int finalSavings = widget.weeklyBudget - totalSpent;
-
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
+                  builder: (_) => AlertDialog(
                     title: const Text("Weekly Summary"),
                     content: Text(
                       "🎉 You saved ₹$finalSavings this week!",
@@ -162,13 +188,15 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               child: const Text("Finish Week"),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 "Expense History",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
 
@@ -178,7 +206,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(expenseHistory[index]["category"]),
-                    trailing: Text("₹${expenseHistory[index]["amount"]}"),
+                    trailing: Text(
+                      "₹${expenseHistory[index]["amount"]}",
+                    ),
                   );
                 },
               ),
