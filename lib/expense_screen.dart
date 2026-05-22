@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'history_screen.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
@@ -23,11 +24,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   String? selectedCategory;
 
   List<Map<String, dynamic>> expenseHistory = [];
+  List<Map<String, dynamic>> weeklyHistory = [];
 
   String message = "";
   Color messageColor = Colors.black;
 
   int totalSpent = 0;
+  int weekNumber = 1;
 
   @override
   void initState() {
@@ -50,10 +53,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       jsonEncode(expenseHistory),
     );
 
-    prefs.setInt(
-      'totalSpent',
-      totalSpent,
+    prefs.setString(
+      'weeklyHistory',
+      jsonEncode(weeklyHistory),
     );
+
+    prefs.setInt('totalSpent', totalSpent);
+    prefs.setInt('weekNumber', weekNumber);
   }
 
   // LOAD DATA
@@ -63,8 +69,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
     String? savedCategories = prefs.getString('categories');
     String? savedHistory = prefs.getString('history');
+    String? savedWeekly = prefs.getString('weeklyHistory');
 
     int savedSpent = prefs.getInt('totalSpent') ?? 0;
+    int savedWeek = prefs.getInt('weekNumber') ?? 1;
 
     setState(() {
 
@@ -84,7 +92,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         );
       }
 
+      if (savedWeekly != null) {
+        weeklyHistory = List<Map<String, dynamic>>.from(
+          jsonDecode(savedWeekly),
+        );
+      }
+
       totalSpent = savedSpent;
+      weekNumber = savedWeek;
 
     });
   }
@@ -138,6 +153,49 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     expenseController.clear();
   }
 
+  void finishWeek() async {
+
+    int finalSavings = widget.weeklyBudget - totalSpent;
+
+    weeklyHistory.add({
+      "week": weekNumber,
+      "spent": totalSpent,
+      "saved": finalSavings,
+    });
+
+    await saveData();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Weekly Summary"),
+        content: Text(
+          "🎉 You saved ₹$finalSavings this week!",
+        ),
+      ),
+    );
+  }
+
+  void startNewWeek() async {
+
+    setState(() {
+
+      totalSpent = 0;
+      expenseHistory.clear();
+
+      weekNumber++;
+
+    });
+
+    await saveData();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Started New Week"),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -147,7 +205,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text("Expense Tracker"),
+        title: Text("Expense Tracker - Week $weekNumber"),
         backgroundColor: const Color(0xFFD4A373),
       ),
 
@@ -231,26 +289,42 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed: () {
-
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text("Weekly Summary"),
-                    content: Text(
-                      "🎉 You saved ₹$finalSavings this week!",
-                    ),
-                  ),
-                );
-
-              },
+              onPressed: finishWeek,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
               ),
               child: const Text("Finish Week"),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: startNewWeek,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+              ),
+              child: const Text("Start New Week"),
+            ),
+
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => HistoryScreen(
+                      weeklyHistory: weeklyHistory,
+                    ),
+                  ),
+                );
+
+              },
+              child: const Text("View Weekly History"),
+            ),
+
+            const SizedBox(height: 20),
 
             const Align(
               alignment: Alignment.centerLeft,
