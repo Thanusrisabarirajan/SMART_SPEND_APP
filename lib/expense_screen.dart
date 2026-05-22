@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
-  final int weeklyBudget; // coming from previous screen
+  final int weeklyBudget;
 
   const ExpenseScreen({
     super.key,
@@ -26,6 +28,66 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   Color messageColor = Colors.black;
 
   int totalSpent = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  // SAVE DATA
+  Future<void> saveData() async {
+
+    final prefs = await SharedPreferences.getInstance();
+
+    prefs.setString(
+      'categories',
+      jsonEncode(widget.categories),
+    );
+
+    prefs.setString(
+      'history',
+      jsonEncode(expenseHistory),
+    );
+
+    prefs.setInt(
+      'totalSpent',
+      totalSpent,
+    );
+  }
+
+  // LOAD DATA
+  Future<void> loadData() async {
+
+    final prefs = await SharedPreferences.getInstance();
+
+    String? savedCategories = prefs.getString('categories');
+    String? savedHistory = prefs.getString('history');
+
+    int savedSpent = prefs.getInt('totalSpent') ?? 0;
+
+    setState(() {
+
+      if (savedCategories != null) {
+        widget.categories.clear();
+
+        widget.categories.addAll(
+          List<Map<String, dynamic>>.from(
+            jsonDecode(savedCategories),
+          ),
+        );
+      }
+
+      if (savedHistory != null) {
+        expenseHistory = List<Map<String, dynamic>>.from(
+          jsonDecode(savedHistory),
+        );
+      }
+
+      totalSpent = savedSpent;
+
+    });
+  }
 
   void addExpense() {
 
@@ -61,6 +123,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         messageColor = Colors.green;
 
       });
+
+      saveData();
 
     } else {
 
@@ -144,7 +208,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 20),
 
-            // 🔵 Remaining balance (live)
             Text(
               "Remaining Balance: ₹$remainingBalance",
               style: const TextStyle(
@@ -156,7 +219,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
             const SizedBox(height: 10),
 
-            // 🟢 Final savings (live)
             Text(
               "💰 Final Savings: ₹$finalSavings",
               style: const TextStyle(
